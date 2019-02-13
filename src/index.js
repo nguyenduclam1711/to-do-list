@@ -112,6 +112,8 @@ class Container extends Component {
         let list = this.state.list
 
         list.splice(index, 1)
+        document.getElementById(`checkbox ${index}`).checked = false
+        document.getElementById(index).style.backgroundColor = "white"
         this.setState({
             list: list
         })
