@@ -19,6 +19,7 @@ class Container extends Component {
         this.showList = this.showList.bind(this)
         this.removeAll = this.removeAll.bind(this)
         this.searchOnChangeHandle = this.searchOnChangeHandle.bind(this)
+        this.deleteElement = this.deleteElement.bind(this)
     }
     
     textOnchangeHandle(e) {
@@ -107,12 +108,22 @@ class Container extends Component {
         }
     }
 
+    deleteElement(index) {
+        let list = this.state.list
+
+        list.splice(index, 1)
+        this.setState({
+            list: list
+        })
+    }
+
     render() {
         const listDisplay = <ListDisplay 
             list={this.state.list}
             removeElement={this.removeElement} 
             removeAll={this.removeAll} 
             onChangeHandleCheckbox={this.onChangeHandleCheckbox.bind(this)}
+            deleteElement={this.deleteElement}
         />
         const result = this.state.result
         return (
@@ -158,7 +169,9 @@ const ListDisplay = props => {
                 type="checkbox"
                 onChange={(e) => props.onChangeHandleCheckbox(e, index)}
             />
-            
+            <button className="DeleteButton" onClick={() => props.deleteElement(index)}>
+                Delete
+            </button>
             </pre>
         </div>
     )

@@ -31,3 +31,7 @@ div.Container {
     border: 1px solid black;
     background-color: white;
 }
+
+.DeleteButton {
+    float: right;
+}
