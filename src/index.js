@@ -158,6 +158,7 @@ const ListDisplay = props => {
                 type="checkbox"
                 onChange={(e) => props.onChangeHandleCheckbox(e, index)}
             />
+            
             </pre>
         </div>
     )
