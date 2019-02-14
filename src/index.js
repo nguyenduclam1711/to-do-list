@@ -25,7 +25,6 @@ class Container extends Component {
         this.modifyElementMode = this.modifyElementMode.bind(this)
         this.modifyElementOnChange = this.modifyElementOnChange.bind(this)
         this.modifyElementOnClick = this.modifyElementOnClick.bind(this)
-        this.exitModifyElement = this.exitModifyElement.bind(this)
     }
     
     textOnchangeHandle(e) {
@@ -165,27 +164,27 @@ class Container extends Component {
 
     modifyElementOnClick(index) {
         let list = this.state.list,
-            modifyElementValue = this.state.modifyElementValue
+            modifyElementValue = this.state.modifyElementValue,
+            modifyElementList = this.state.modifyElementList
 
         if (modifyElementValue !== "") {
             list[index] = modifyElementValue
-            window.alert(`modify successfully`)
+            modifyElementList[index] = (0)
+            this.setState({
+                list: list,
+                modifyElementValue: "",
+                modifyElementList: modifyElementList,
+            })
+        } 
+        else {
+            modifyElementList[index] = 0
+            this.setState({
+                modifyElementList: modifyElementList,
+                modifyElementValue: "",
+            })
         }
-        this.setState({
-            list: list,
-            modifyElementValue: "",
-        })
     }
 
-    exitModifyElement(index) {
-        let modifyElementList = this.state.modifyElementList
-        
-        modifyElementList[index] = 0
-        this.setState({
-            modifyElementList: modifyElementList,
-            modifyElementValue: "",
-        })
-    }
 
     //---------------------------------------------------------------------------------------------
 
@@ -201,7 +200,6 @@ class Container extends Component {
             modifyElementOnChange = {this.modifyElementOnChange}
             modifyElementOnClick = {this.modifyElementOnClick}
             modifyElementValue = {this.state.modifyElementValue}
-            exitModifyElement = {this.exitModifyElement}
         />
         const result = this.state.result
         
@@ -237,39 +235,29 @@ class Container extends Component {
     }
 }
 
- //---------------------------------------------------------------------------------------------
+
 
 const ListDisplay = props => {
     let modifyElementList = props.modifyElementList
     let display = props.list.map((element, index) => {
-        if (modifyElementList[index] === 0) 
             return (
                 <div className="Display" id={index} key={index} >
-                    <pre onClick={() => props.modifyElementMode(index)}>
-                        {index + 1}. {element}
-                    </pre>
-                    <input 
-                        className="Checkbox"
-                        id={`checkbox ${index}`}
-                        name="list"
-                        type="checkbox"
-                        onChange={(e) => props.onChangeHandleCheckbox(e, index)}
-                    />
-                    <button className="DeleteButton" onClick={() => props.deleteElement(index)}>
-                        Delete
-                    </button>
-                </div>
-            )
-        else 
-            return (
-                <div className="Display" id={index} key={index}>
-                    <input id="ModifyValueInput" value={props.modifyElementValue} onChange={props.modifyElementOnChange} />
-                    <button id="ModifyButton" onClick={() => props.modifyElementOnClick(index)}>
-                        Modify
-                    </button>
-                    <button id="ExitModifyButton" onClick={() => props.exitModifyElement(index)}>
-                        Exit Modify
-                    </button>
+                    {modifyElementList[index] === 0 ? 
+                        <>
+                            <pre onClick={() => props.modifyElementMode(index)}>
+                                {index  + 1}. {element}
+                            </pre>
+                        </>
+                        :
+                        <>
+                            <pre>{index + 1}. {element}</pre>
+                            <input id="ModifyValueInput" value={props.modifyElementValue} onChange={props.modifyElementOnChange} />
+                            <button id="ModifyButton" onClick={() => props.modifyElementOnClick(index)}>
+                                Modify
+                            </button>
+                        </>
+                    }
+                    
                     <input 
                         className="Checkbox"
                         id={`checkbox ${index}`}
