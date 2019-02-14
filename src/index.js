@@ -6,11 +6,13 @@ class Container extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            inputTextValue: '',
+            inputTextValue: "",
+            modifyElementValue: "",
             list: [],
             showList: true,
             removeIndex: [],
             result: [],
+            modifyElementList: [],
         }
         this.addToListOnClickHandle = this.addToListOnClickHandle.bind(this)
         this.textOnchangeHandle = this.textOnchangeHandle.bind(this)
@@ -20,6 +22,10 @@ class Container extends Component {
         this.removeAll = this.removeAll.bind(this)
         this.searchOnChangeHandle = this.searchOnChangeHandle.bind(this)
         this.deleteElement = this.deleteElement.bind(this)
+        this.modifyElementMode = this.modifyElementMode.bind(this)
+        this.modifyElementOnChange = this.modifyElementOnChange.bind(this)
+        this.modifyElementOnClick = this.modifyElementOnClick.bind(this)
+        this.exitModifyElement = this.exitModifyElement.bind(this)
     }
     
     textOnchangeHandle(e) {
@@ -48,7 +54,8 @@ class Container extends Component {
         if (this.state.inputTextValue === '') return document.getElementById("TextInput").focus()
         this.setState({
             list: [...this.state.list, this.state.inputTextValue],
-            inputTextValue: ''
+            inputTextValue: '',
+            modifyElementList: [...this.state.modifyElementList, 0]
         })
         document.getElementById("TextInput").focus()
     }
@@ -57,14 +64,16 @@ class Container extends Component {
         if (e.key === 'Enter' && this.state.inputTextValue !== '') {
             this.setState({
                 list: [...this.state.list, this.state.inputTextValue],
-                inputTextValue: ''
+                inputTextValue: '',
+                modifyElementList: [...this.state.modifyElementList, 0]
             })
         }
     }
 
     removeElement() {
         let list = this.state.list,
-            removeIndex = this.state.removeIndex
+            removeIndex = this.state.removeIndex,
+            modifyElementList = this.state.modifyElementList
         list = list.map(function(element, index) {
             if (removeIndex.includes(index)) {
                 document.getElementById(`checkbox ${index}`).checked = false
@@ -73,9 +82,16 @@ class Container extends Component {
             }
             return element
         })
+        modifyElementList = modifyElementList.map(function(element, index) {
+            if (removeIndex.includes(index)) {
+                element = null
+            }
+            return element
+        })
         this.setState({
             list: list.filter(element => element !== null),
             removeIndex: [],
+            modifyElementList: modifyElementList.filter(element => element !== null)
         })
     }
 
@@ -83,6 +99,7 @@ class Container extends Component {
         this.setState({
             list: [],
             removeIndex: [],
+            modifyElementList: []
         })
     }
 
@@ -109,15 +126,59 @@ class Container extends Component {
     }
 
     deleteElement(index) {
-        let list = this.state.list
+        let list = this.state.list,
+            modifyElementList = this.state.modifyElementList
 
         list.splice(index, 1)
+        modifyElementList.splice(index, 1)
         document.getElementById(`checkbox ${index}`).checked = false
         document.getElementById(index).style.backgroundColor = "white"
         this.setState({
-            list: list
+            list: list,
+            modifyElementList: modifyElementList,
+            modifyElementValue: "",
         })
     }
+
+    modifyElementMode(index) {
+        let modifyElementList = this.state.modifyElementList
+        
+        modifyElementList = modifyElementList.map((e, i) => i === index ? 1 : 0)
+        this.setState({
+            modifyElementList: modifyElementList
+        })
+    }
+
+    modifyElementOnChange(e) {
+        this.setState({
+            modifyElementValue: e.target.value
+        })
+    }
+
+    modifyElementOnClick(index) {
+        let list = this.state.list,
+            modifyElementValue = this.state.modifyElementValue
+
+        if (modifyElementValue !== "") {
+            list[index] = modifyElementValue
+            window.alert(`modify successfully`)
+        }
+        this.setState({
+            list: list,
+            modifyElementValue: "",
+        })
+    }
+
+    exitModifyElement(index) {
+        let modifyElementList = this.state.modifyElementList
+        
+        modifyElementList[index] = 0
+        this.setState({
+            modifyElementList: modifyElementList,
+            modifyElementValue: "",
+        })
+    }
+
 
     render() {
         const listDisplay = <ListDisplay 
@@ -126,8 +187,15 @@ class Container extends Component {
             removeAll={this.removeAll} 
             onChangeHandleCheckbox={this.onChangeHandleCheckbox.bind(this)}
             deleteElement={this.deleteElement}
+            modifyElementList={this.state.modifyElementList}
+            modifyElementMode = {this.modifyElementMode}
+            modifyElementOnChange = {this.modifyElementOnChange}
+            modifyElementOnClick = {this.modifyElementOnClick}
+            modifyElementValue = {this.state.modifyElementValue}
+            exitModifyElement = {this.exitModifyElement}
         />
         const result = this.state.result
+        
         return (
             <div className="Container" >
                 <div className="TextInput" >
@@ -160,23 +228,52 @@ class Container extends Component {
     }
 }
 
+
+
 const ListDisplay = props => {
-    const display = props.list.map((element, index) => 
-        <div className="Display" id={index} key={index}>
-            <pre>{index + 1}. {element}
-            <input 
-                className="Checkbox"
-                id={`checkbox ${index}`}
-                name="list"
-                type="checkbox"
-                onChange={(e) => props.onChangeHandleCheckbox(e, index)}
-            />
-            <button className="DeleteButton" onClick={() => props.deleteElement(index)}>
-                Delete
-            </button>
-            </pre>
-        </div>
-    )
+    let modifyElementList = props.modifyElementList
+    let display = props.list.map((element, index) => {
+        if (modifyElementList[index] === 0) 
+            return (
+                <div className="Display" id={index} key={index} >
+                    <pre onClick={() => props.modifyElementMode(index)}>
+                        {index + 1}. {element}
+                    </pre>
+                    <input 
+                        className="Checkbox"
+                        id={`checkbox ${index}`}
+                        name="list"
+                        type="checkbox"
+                        onChange={(e) => props.onChangeHandleCheckbox(e, index)}
+                    />
+                    <button className="DeleteButton" onClick={() => props.deleteElement(index)}>
+                        Delete
+                    </button>
+                </div>
+            )
+        else 
+            return (
+                <div className="Display" id={index} key={index}>
+                    <input id="modifyValue" value={props.modifyElementValue} onChange={props.modifyElementOnChange} />
+                    <button id="ModifyButton" onClick={() => props.modifyElementOnClick(index)}>
+                        Modify
+                    </button>
+                    <button id="ExitModifyButton" onClick={() => props.exitModifyElement(index)}>
+                        Exit Modify
+                    </button>
+                    <input 
+                        className="Checkbox"
+                        id={`checkbox ${index}`}
+                        name="list"
+                        type="checkbox"
+                        onChange={(e) => props.onChangeHandleCheckbox(e, index)}
+                    />
+                    <button className="DeleteButton" onClick={() => props.deleteElement(index)}>
+                        Delete
+                    </button>
+                </div>
+            )
+    })
 
     return (
         <div className="ListDisplay">

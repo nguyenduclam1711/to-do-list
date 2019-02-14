@@ -7,7 +7,7 @@ div.Container {
 }
 
 .Display {
-    width: 400px;
+    width: 500px;
     overflow: auto;
     margin:0px auto;
     text-align: left;
@@ -24,7 +24,7 @@ div.Container {
 }
 
 .Searchlist {
-    width: 400px;
+    width: 500px;
     overflow: auto;
     margin:0px auto;
     text-align: left;
