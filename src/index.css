@@ -35,3 +35,7 @@ div.Container {
 .DeleteButton {
     float: right;
 }
+
+pre {
+    width: fit-content
+}

@@ -91,16 +91,21 @@ class Container extends Component {
         this.setState({
             list: list.filter(element => element !== null),
             removeIndex: [],
-            modifyElementList: modifyElementList.filter(element => element !== null)
+            modifyElementList: modifyElementList.filter(element => element !== null),
+            modifyElementValue: "",
+            result: []
         })
+        document.getElementById("SearchInput").value = ""
     }
 
     removeAll() {
         this.setState({
             list: [],
             removeIndex: [],
-            modifyElementList: []
+            modifyElementList: [],
+            result: []
         })
+        document.getElementById("SearchInput").value = ""
     }
 
     showList() {
@@ -137,7 +142,9 @@ class Container extends Component {
             list: list,
             modifyElementList: modifyElementList,
             modifyElementValue: "",
+            result: []
         })
+        document.getElementById("SearchInput").value = ""
     }
 
     modifyElementMode(index) {
@@ -145,7 +152,8 @@ class Container extends Component {
         
         modifyElementList = modifyElementList.map((e, i) => i === index ? 1 : 0)
         this.setState({
-            modifyElementList: modifyElementList
+            modifyElementList: modifyElementList,
+            modifyElementValue: ""
         })
     }
 
@@ -179,6 +187,7 @@ class Container extends Component {
         })
     }
 
+    //---------------------------------------------------------------------------------------------
 
     render() {
         const listDisplay = <ListDisplay 
@@ -228,7 +237,7 @@ class Container extends Component {
     }
 }
 
-
+ //---------------------------------------------------------------------------------------------
 
 const ListDisplay = props => {
     let modifyElementList = props.modifyElementList
@@ -254,7 +263,7 @@ const ListDisplay = props => {
         else 
             return (
                 <div className="Display" id={index} key={index}>
-                    <input id="modifyValue" value={props.modifyElementValue} onChange={props.modifyElementOnChange} />
+                    <input id="ModifyValueInput" value={props.modifyElementValue} onChange={props.modifyElementOnChange} />
                     <button id="ModifyButton" onClick={() => props.modifyElementOnClick(index)}>
                         Modify
                     </button>
