@@ -17,7 +17,7 @@ class Container extends Component {
         }
         this.addToListOnClickHandle = this.addToListOnClickHandle.bind(this)
         this.textOnchangeHandle = this.textOnchangeHandle.bind(this)
-        this.onKeyPressHandle = this.onKeyPressHandle.bind(this)
+        this.addToListOnKeyPressHandle = this.addToListOnKeyPressHandle.bind(this)
         this.removeElement = this.removeElement.bind(this)
         this.showList = this.showList.bind(this)
         this.removeAll = this.removeAll.bind(this)
@@ -26,6 +26,7 @@ class Container extends Component {
         this.modifyElementMode = this.modifyElementMode.bind(this)
         this.modifyElementOnChange = this.modifyElementOnChange.bind(this)
         this.modifyElementOnClick = this.modifyElementOnClick.bind(this)
+        this.modifyOnKeyPressHandle = this.modifyOnKeyPressHandle.bind(this)
     }
     
     textOnchangeHandle(e) { // cập nhật giá trị inputTextValue khi người dùng gõ 
@@ -66,7 +67,7 @@ class Container extends Component {
         document.getElementById("TextInput").focus()
     }
 
-    onKeyPressHandle(e) {   // khi ấn enter cũng có thể thêm vào list
+    addToListOnKeyPressHandle(e) {   // khi ấn enter cũng có thể thêm vào list
         let list = this.state.list,
             inputSearchValue = this.state.inputSearchValue
 
@@ -200,11 +201,28 @@ class Container extends Component {
         }
     }
 
+    modifyOnKeyPressHandle(e, index) {
+        let list = this.state.list,
+            inputSearchValue = this.state.inputSearchValue,
+            modifyElementValue = this.state.modifyElementValue,
+            modifyElementList = this.state.modifyElementList
+
+        if (e.key === 'Enter' && this.state.modifyElementValue !== '') {
+            list[index] = modifyElementValue
+            modifyElementList[index] = 0
+            this.setState({
+                list: list,
+                modifyElementValue: "",
+                modifyElementList: modifyElementList,
+                result: updateSearchList(list, inputSearchValue)
+            })
+        }
+    }
 
     //---------------------------------------------------------------------------------------------
 
     render() {
-        const listDisplay = <ListDisplay    // chuyền props cho class ListDisplay
+        const listDisplay = <ListDisplay    // chuyền props cho function ListDisplay
             list={this.state.list}
             removeElement={this.removeElement} 
             removeAll={this.removeAll} 
@@ -215,6 +233,7 @@ class Container extends Component {
             modifyElementOnChange = {this.modifyElementOnChange}
             modifyElementOnClick = {this.modifyElementOnClick}
             modifyElementValue = {this.state.modifyElementValue}
+            modifyOnKeyPressHandle = {this.modifyOnKeyPressHandle.bind(this)}
         />
         const result = this.state.result
 
@@ -225,7 +244,7 @@ class Container extends Component {
                     <input type="text" id="TextInput"
                         value={this.state.inputTextValue}
                         onChange={this.textOnchangeHandle}
-                        onKeyPress={this.onKeyPressHandle}
+                        onKeyPress={this.addToListOnKeyPressHandle}
                     />
                     <button id="AddToListButton" onClick={this.addToListOnClickHandle}>Add to the list</button>
                     <br /> 
@@ -254,7 +273,7 @@ class Container extends Component {
 
 
 
-const ListDisplay = props => {  // class chỉ để hiển thị list
+const ListDisplay = props => {  // function chỉ để hiển thị list
     let modifyElementList = props.modifyElementList
     let display = props.list.map((element, index) => {
             return (
@@ -268,13 +287,16 @@ const ListDisplay = props => {  // class chỉ để hiển thị list
                         :
                         <>
                             <pre>{index + 1}. {element}</pre>
-                            <input id="ModifyValueInput" value={props.modifyElementValue} onChange={props.modifyElementOnChange} />
+                            <input id="ModifyValueInput" 
+                                value={props.modifyElementValue} 
+                                onChange={props.modifyElementOnChange}
+                                onKeyPress={(e) => props.modifyOnKeyPressHandle(e, index) }
+                            />
                             <button id="ModifyButton" onClick={() => props.modifyElementOnClick(index)}>
                                 Modify
                             </button>
                         </>
-                    }
-                    
+                    }                 
                     <input 
                         className="Checkbox"
                         id={`checkbox ${index}`}
