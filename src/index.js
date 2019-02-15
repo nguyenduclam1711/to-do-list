@@ -6,13 +6,14 @@ class Container extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            inputTextValue: "",
-            modifyElementValue: "",
-            list: [],
-            showList: true,
-            removeIndex: [],
-            result: [],
-            modifyElementList: [],
+            inputTextValue: "", //input do người dùng nhập vào để add vào list
+            modifyElementValue: "", // input do người dùng nhập, đây là giá trị mà người dùng muốn modify thành
+            inputSearchValue: "",   // input do người dùng nhập, giá trị search
+            list: [], // list to do 
+            showList: true, // giá trị xem có muốn show list hay k, cũng đ để làm gì :v, cho vui
+            removeIndex: [], // vị trí của những công việc mà người dùng muốn remove
+            result: [], // kết quả tìm kiếm
+            modifyElementList: [],  // 1 mảng sẽ fill toàn số 0, khi người dùng muốn modify 1 vị trí thì thì index chỗ đấy thành 1
         }
         this.addToListOnClickHandle = this.addToListOnClickHandle.bind(this)
         this.textOnchangeHandle = this.textOnchangeHandle.bind(this)
@@ -27,13 +28,13 @@ class Container extends Component {
         this.modifyElementOnClick = this.modifyElementOnClick.bind(this)
     }
     
-    textOnchangeHandle(e) {
+    textOnchangeHandle(e) { // cập nhật giá trị inputTextValue khi người dùng gõ 
         this.setState({
             inputTextValue: e.target.value
         })
     }
     
-    searchOnChangeHandle(e) {
+    searchOnChangeHandle(e) { // tìm kiếm khi có sự thay đổi của input (khi người dùng thay đổi input)
         const list = this.state.list,
               inputValue = e.target.value
         let result = this.state.result
@@ -45,76 +46,87 @@ class Container extends Component {
         })
         if (inputValue.trim() === "") result = []  
         this.setState({
-            result: result
+            result: result,
+            inputSearchValue: inputValue,
         })
     }
 
-    addToListOnClickHandle() {
+    addToListOnClickHandle() {  // simple as its name, thêm vào list khi click
+        let list = this.state.list,
+            inputSearchValue = this.state.inputSearchValue
+
         if (this.state.inputTextValue === '') return document.getElementById("TextInput").focus()
+        list = [...list, this.state.inputTextValue]
         this.setState({
-            list: [...this.state.list, this.state.inputTextValue],
+            list: list,
             inputTextValue: '',
-            modifyElementList: [...this.state.modifyElementList, 0]
+            modifyElementList: [...this.state.modifyElementList, 0],
+            result: updateSearchList(list, inputSearchValue)
         })
         document.getElementById("TextInput").focus()
     }
 
-    onKeyPressHandle(e) {
+    onKeyPressHandle(e) {   // khi ấn enter cũng có thể thêm vào list
+        let list = this.state.list,
+            inputSearchValue = this.state.inputSearchValue
+
         if (e.key === 'Enter' && this.state.inputTextValue !== '') {
+            list = [...list, this.state.inputTextValue]
             this.setState({
-                list: [...this.state.list, this.state.inputTextValue],
+                list: list,
                 inputTextValue: '',
-                modifyElementList: [...this.state.modifyElementList, 0]
+                modifyElementList: [...this.state.modifyElementList, 0],
+                result: updateSearchList(list, inputSearchValue)
             })
         }
     }
 
-    removeElement() {
+    removeElement() {   // xóa những giá trị mà người dùng đã chọn
         let list = this.state.list,
             removeIndex = this.state.removeIndex,
-            modifyElementList = this.state.modifyElementList
+            modifyElementList = this.state.modifyElementList,
+            inputSearchValue = this.state.inputSearchValue
+
         list = list.map(function(element, index) {
-            if (removeIndex.includes(index)) {
-                document.getElementById(`checkbox ${index}`).checked = false
-                document.getElementById(index).style.backgroundColor = "white"
-                element = null
-            }
-            return element
-        })
+                        if (removeIndex.includes(index)) {
+                            document.getElementById(`checkbox ${index}`).checked = false
+                            document.getElementById(index).style.backgroundColor = "white"
+                            element = null
+                        }
+                        return element
+                    }).filter(element => element !== null)
         modifyElementList = modifyElementList.map(function(element, index) {
-            if (removeIndex.includes(index)) {
-                element = null
-            }
-            return element
-        })
+                                                if (removeIndex.includes(index)) {
+                                                    element = null
+                                                }
+                                                    return element
+                                                }).filter(element => element !== null)
         this.setState({
-            list: list.filter(element => element !== null),
+            list: list,
             removeIndex: [],
-            modifyElementList: modifyElementList.filter(element => element !== null),
+            modifyElementList: modifyElementList,
             modifyElementValue: "",
-            result: []
+            result: updateSearchList(list, inputSearchValue)
         })
-        document.getElementById("SearchInput").value = ""
     }
 
-    removeAll() {
+    removeAll() {   // xóa tất cả trong list
         this.setState({
             list: [],
             removeIndex: [],
             modifyElementList: [],
             result: []
         })
-        document.getElementById("SearchInput").value = ""
     }
 
-    showList() {
+    showList() {    //show list
         this.setState({
             showList: !this.state.showList,
             removeIndex: [],
         })
     }
 
-    onChangeHandleCheckbox(e, index) {
+    onChangeHandleCheckbox(e, index) {  // khi người dùng tick vào check box thì sẽ thay đổi về màu cho dễ nhìn
         if (e.target.checked) {
             this.setState({
                 removeIndex: [...this.state.removeIndex, index]
@@ -129,24 +141,25 @@ class Container extends Component {
         }
     }
 
-    deleteElement(index) {
+    deleteElement(index) {  // xóa công việc tại vị trí index
         let list = this.state.list,
-            modifyElementList = this.state.modifyElementList
+            modifyElementList = this.state.modifyElementList,
+            inputSearchValue = this.state.inputSearchValue
 
         list.splice(index, 1)
         modifyElementList.splice(index, 1)
         document.getElementById(`checkbox ${index}`).checked = false
         document.getElementById(index).style.backgroundColor = "white"
+        
         this.setState({
             list: list,
             modifyElementList: modifyElementList,
             modifyElementValue: "",
-            result: []
+            result: updateSearchList(list, inputSearchValue)
         })
-        document.getElementById("SearchInput").value = ""
     }
 
-    modifyElementMode(index) {
+    modifyElementMode(index) {  // chuyển sang chế độ modify
         let modifyElementList = this.state.modifyElementList
         
         modifyElementList = modifyElementList.map((e, i) => i === index ? 1 : 0)
@@ -156,24 +169,26 @@ class Container extends Component {
         })
     }
 
-    modifyElementOnChange(e) {
+    modifyElementOnChange(e) {  //  cập nhật giá trị modifyElementValue khi người dùng thay đổi input
         this.setState({
             modifyElementValue: e.target.value
         })
     }
 
-    modifyElementOnClick(index) {
+    modifyElementOnClick(index) {   // khi click thì sẽ modify giá trị và thoát luôn chê độ modify
         let list = this.state.list,
             modifyElementValue = this.state.modifyElementValue,
-            modifyElementList = this.state.modifyElementList
+            modifyElementList = this.state.modifyElementList,
+            inputSearchValue = this.state.inputSearchValue
 
         if (modifyElementValue !== "") {
             list[index] = modifyElementValue
-            modifyElementList[index] = (0)
+            modifyElementList[index] = 0
             this.setState({
                 list: list,
                 modifyElementValue: "",
                 modifyElementList: modifyElementList,
+                result: updateSearchList(list, inputSearchValue)
             })
         } 
         else {
@@ -189,7 +204,7 @@ class Container extends Component {
     //---------------------------------------------------------------------------------------------
 
     render() {
-        const listDisplay = <ListDisplay 
+        const listDisplay = <ListDisplay    // chuyền props cho class ListDisplay
             list={this.state.list}
             removeElement={this.removeElement} 
             removeAll={this.removeAll} 
@@ -202,10 +217,10 @@ class Container extends Component {
             modifyElementValue = {this.state.modifyElementValue}
         />
         const result = this.state.result
-        
+
         return (
-            <div className="Container" >
-                <div className="TextInput" >
+            <div className="Container" >   
+                <div className="List" >    
                     <h2>Add to list</h2>
                     <input type="text" id="TextInput"
                         value={this.state.inputTextValue}
@@ -218,17 +233,19 @@ class Container extends Component {
                     {this.state.showList === false ? null : listDisplay}
                 </div>
                 <hr/>
-                <div className="SearchInput">
+                <div className="Search">
                     <h2>Search box</h2>
                     <input type="text" id="SearchInput" 
                         onChange={this.searchOnChangeHandle}
                     />
                     <h3>Result</h3>
-                    {result.map((element, index) => 
+                    {   
+                        result.map((element, index) => 
                         <div className="Searchlist" key={`Search list ${index}`}>
                             {element.index + 1}. {element.element}
                         </div> 
                     )}
+                    
                 </div>
             </div>
       )
@@ -237,7 +254,7 @@ class Container extends Component {
 
 
 
-const ListDisplay = props => {
+const ListDisplay = props => {  // class chỉ để hiển thị list
     let modifyElementList = props.modifyElementList
     let display = props.list.map((element, index) => {
             return (
@@ -282,6 +299,17 @@ const ListDisplay = props => {
             <button id="RemoveAllButton" onClick={props.removeAll}>Remove All</button>
         </div>
     )
+}
+
+const updateSearchList = (list, inputSearchValue) => {  // function update lại kết quả tìm kiếm khi list bị thay đổi
+    let result = []
+    list.forEach((e, i) => {
+        if (e.split(/\s/).join("").includes(inputSearchValue.split(/\s/).join("")) ) {
+            result = [...result, {index: i, element: e}]
+        }
+    })
+    if (inputSearchValue.trim() === "") result = []  
+    return result
 }
 
 ReactDOM.render(<Container />, document.getElementById('root'))
