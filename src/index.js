@@ -34,13 +34,13 @@ class Container extends Component {
         })
     }
     
-    searchOnChangeHandle(e) { // tìm kiếm khi có sự thay đổi của input (khi người dùng thay đổi input)
+    searchOnChangeHandle(e) { // tìm kiếm khi có sự thay đổi của input (khi người dùng thay đổi input), trả lại kết quả tìm kiếm
         const list = this.state.list,
               inputValue = e.target.value
         let result = this.state.result
         result = []
         list.forEach((e, i) => {
-            if (e.split(/\s/).join("").includes(inputValue.split(/\s/).join("")) ) {
+            if (e.toUpperCase().split(/\s/).join("").includes(inputValue.toUpperCase().split(/\s/).join("")) ) {
                 result = [...result, {index: i, element: e}]
             }
         })
@@ -304,7 +304,7 @@ const ListDisplay = props => {  // class chỉ để hiển thị list
 const updateSearchList = (list, inputSearchValue) => {  // function update lại kết quả tìm kiếm khi list bị thay đổi
     let result = []
     list.forEach((e, i) => {
-        if (e.split(/\s/).join("").includes(inputSearchValue.split(/\s/).join("")) ) {
+        if (e.toUpperCase().split(/\s/).join("").includes(inputSearchValue.toUpperCase().split(/\s/).join("")) ) {
             result = [...result, {index: i, element: e}]
         }
     })
