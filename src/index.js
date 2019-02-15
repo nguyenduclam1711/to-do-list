@@ -220,7 +220,7 @@ class Container extends Component {
 
         return (
             <div className="Container" >   
-                <div className="List" >    
+                <div className="List" >    {/* hiển thị list, và tất cả các chức năng như thêm, xóa sửa */}
                     <h2>Add to list</h2>
                     <input type="text" id="TextInput"
                         value={this.state.inputTextValue}
@@ -233,7 +233,7 @@ class Container extends Component {
                     {this.state.showList === false ? null : listDisplay}
                 </div>
                 <hr/>
-                <div className="Search">
+                <div className="Search">    {/* hiển thị phần search */}
                     <h2>Search box</h2>
                     <input type="text" id="SearchInput" 
                         onChange={this.searchOnChangeHandle}
