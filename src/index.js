@@ -272,9 +272,9 @@ class Container extends Component {
 }
 
 
-class ListDisplay extends Component {
+class ListDisplay extends Component {   // class ListDisplay để hiển thị list
     componentDidUpdate(prevProps, prevState) {
-        if (prevProps.modifyElementList !== this.props.modifyElementList) {
+        if (prevProps.modifyElementList !== this.props.modifyElementList) {     // nếu modifyElementList bị thay đổi thì sẽ focus vào ModifyValueInput
             if (this.props.modifyElementList.filter(x => x === 1).length === 1)
                 document.getElementById("ModifyValueInput").focus()
         }
