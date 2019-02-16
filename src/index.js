@@ -272,55 +272,64 @@ class Container extends Component {
 }
 
 
+class ListDisplay extends Component {
+    componentDidUpdate(prevProps, prevState) {
+        if (prevProps.modifyElementList !== this.props.modifyElementList) {
+            if (this.props.modifyElementList.filter(x => x === 1).length === 1)
+                document.getElementById("ModifyValueInput").focus()
+        }
+    }
 
-const ListDisplay = props => {  // function chỉ để hiển thị list
-    let modifyElementList = props.modifyElementList
-    let display = props.list.map((element, index) => {
-            return (
-                <div className="Display" id={index} key={index} >
-                    {modifyElementList[index] === 0 ? 
-                        <>
-                            <pre onClick={() => props.modifyElementMode(index)}>
-                                {index  + 1}. {element}
-                            </pre>
-                        </>
-                        :
-                        <>
-                            <pre>{index + 1}. {element}</pre>
-                            <input id="ModifyValueInput" 
-                                value={props.modifyElementValue} 
-                                onChange={props.modifyElementOnChange}
-                                onKeyPress={(e) => props.modifyOnKeyPressHandle(e, index) }
-                            />
-                            <button id="ModifyButton" onClick={() => props.modifyElementOnClick(index)}>
-                                Modify
-                            </button>
-                        </>
-                    }                 
-                    <input 
-                        className="Checkbox"
-                        id={`checkbox ${index}`}
-                        name="list"
-                        type="checkbox"
-                        onChange={(e) => props.onChangeHandleCheckbox(e, index)}
-                    />
-                    <button className="DeleteButton" onClick={() => props.deleteElement(index)}>
-                        Delete
-                    </button>
-                </div>
-            )
-    })
+    render() {
+        let modifyElementList = this.props.modifyElementList,
+            display = this.props.list.map((element, index) => {
+                return (
+                    <div className="Display" id={index} key={index} >
+                        {modifyElementList[index] === 0 ? 
+                            <>
+                                <pre onClick={() => this.props.modifyElementMode(index)}>
+                                    {index  + 1}. {element}
+                                </pre>
+                            </>
+                            :
+                            <>
+                                <pre>{index + 1}. {element}</pre>
+                                <input id="ModifyValueInput" 
+                                    value={this.props.modifyElementValue} 
+                                    onChange={this.props.modifyElementOnChange}
+                                    onKeyPress={(e) => this.props.modifyOnKeyPressHandle(e, index) }
+                                />
+                                <button id="ModifyButton" onClick={() => this.props.modifyElementOnClick(index)}>
+                                    Modify
+                                </button>
+                            </>
+                        }         
+                        <input 
+                            className="Checkbox"
+                            id={`checkbox ${index}`}
+                            name="list"
+                            type="checkbox"
+                            onChange={(e) => this.props.onChangeHandleCheckbox(e, index)}
+                        />
+                        <button className="DeleteButton" onClick={() => this.props.deleteElement(index)}>
+                            Delete
+                        </button>
+                    </div>
+                )
+            })
 
-    return (
-        <div className="ListDisplay">
-            <h2>To do list</h2>
-            <div>
-                {display}
-            </div> <br/>
-            <button id="RemoveButton" onClick={props.removeElement}>Remove</button><br/>
-            <button id="RemoveAllButton" onClick={props.removeAll}>Remove All</button>
-        </div>
-    )
+        return (
+            <div className="ListDisplay">
+                <h2>To do list</h2>
+                <div>
+                    {display}
+                </div> <br/>
+                <button id="RemoveButton" onClick={this.props.removeElement}>Remove</button><br/>
+                <button id="RemoveAllButton" onClick={this.props.removeAll}>Remove All</button>
+            </div>
+        )
+    }
+    
 }
 
 const updateSearchList = (list, inputSearchValue) => {  // function update lại kết quả tìm kiếm khi list bị thay đổi
