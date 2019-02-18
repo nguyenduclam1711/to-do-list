@@ -201,7 +201,7 @@ class Container extends Component {
         }
     }
 
-    modifyOnKeyPressHandle(e, index) {
+    modifyOnKeyPressHandle(e, index) {  // sau khi ấn Enter thì cũng có thể modify giá trí và thoát chế độ modify
         let list = this.state.list,
             inputSearchValue = this.state.inputSearchValue,
             modifyElementValue = this.state.modifyElementValue,
